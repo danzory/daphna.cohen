@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="format-detection" content="telephone=no">
+    <title>דוח התקדמות - דפנה כהן</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Assistant', sans-serif;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-font-smoothing: antialiased;
+            /* Safe area for iPhone notch/home bar */
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+            padding-left: env(safe-area-inset-left);
+            padding-right: env(safe-area-inset-right);
+        }
+        
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        /* Hide scrollbar for IE, Edge and Firefox */
+        .no-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+
+        .tab-active {
+            color: #db2777; /* pink-600 */
+            border-bottom: 2px solid #db2777;
+        }
+        
+        body::before {
+            content: 'ARMOR BUILDER';
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-15deg);
+            font-size: 14vw;
+            font-weight: 900;
+            color: rgba(0, 0, 0, 0.03);
+            z-index: -1;
+            pointer-events: none;
+            text-transform: uppercase;
+            white-space: nowrap;
+            user-select: none;
+        }
+
+        .checkbox-wrapper input:checked + div {
+            background-color: #ecfdf5; /* green-50 */
+            border-color: #10b981; /* green-500 */
+        }
+        .checkbox-wrapper input:checked + div span {
+            color: #047857; /* green-700 */
+            text-decoration: line-through;
+        }
+
+        /* Prevent zoom on iOS inputs */
+        input, textarea {
+            font-size: 16px !important; 
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 min-h-screen flex flex-col">
+    <div class="container mx-auto p-4 sm:p-6 lg:p-8 flex-grow">
+        <header class="relative text-center mb-8 mt-2">
+             <div class="absolute top-0 left-0 h-10 w-20 sm:h-16 sm:w-32 opacity-80">
+                <svg viewBox="0 0 120 50" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#2d3748">
+                        <rect x="18" y="6" width="8" height="38" rx="2"/>
+                        <rect x="10" y="9" width="8" height="32" rx="2"/>
+                        <rect x="2" y="12" width="8" height="26" rx="2"/>
+                    </g>
+                    <rect x="26" y="18" width="6" height="14" rx="2" fill="#a0aec0"/>
+                    <g fill="#2d3748">
+                        <rect x="94" y="6" width="8" height="38" rx="2"/>
+                        <rect x="102" y="9" width="8" height="32" rx="2"/>
+                        <rect x="110" y="12" width="8" height="26" rx="2"/>
+                    </g>
+                    <rect x="88" y="18" width="6" height="14" rx="2" fill="#a0aec0"/>
+                    <path d="M 32 25 L 50 25 L 53 28 L 58 10 L 63 45 L 66 25 L 88 25" stroke="#ef4444" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" fill="none"/>
+                </svg>
+            </div>
+            <h1 class="text-3xl sm:text-5xl font-black text-gray-900 tracking-tight">דוח התקדמות</h1>
+            <p class="text-lg font-medium text-gray-600 mt-1">דפנה כהן</p>
+        </header>
+
+        <main class="pb-20"> <!-- Added padding bottom for scrolling space on mobile -->
+            <!-- Tab Navigation (Scrollable on mobile) -->
+            <div class="sticky top-0 z-10 bg-gray-100/95 backdrop-blur-sm pt-2 mb-6">
+                <div class="flex border-b border-gray-300 overflow-x-auto no-scrollbar pb-1 px-1 gap-2">
+                    <button id="progressTab" class="flex-shrink-0 py-2 px-4 font-bold text-sm transition-colors duration-200 tab-active rounded-t-lg">דוח התקדמות</button>
+                    <button id="plansTab" class="flex-shrink-0 py-2 px-4 font-bold text-sm text-gray-500 hover:text-gray-700 transition-colors duration-200 rounded-t-lg">תוכניות אישיות</button>
+                    <button id="homeworkTab" class="flex-shrink-0 py-2 px-4 font-bold text-sm text-gray-500 hover:text-gray-700 transition-colors duration-200 flex items-center gap-2 rounded-t-lg">
+                        <span>שיעורי בית</span>
+                        <span class="bg-pink-100 text-pink-600 text-[10px] font-bold px-2 py-0.5 rounded-full">חדש</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Content Panes -->
+            <div id="contentPanes">
+                <!-- Progress Report Pane -->
+                <div id="progressContent" class="space-y-6">
+                    <!-- אזור 1: סיכום כללי (Grid adjusted for mobile) -->
+                    <div class="grid grid-cols-2 gap-3 sm:gap-6">
+                        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 flex flex-col items-center justify-center text-center">
+                            <h3 class="text-xs sm:text-lg font-bold text-gray-400 mb-1 uppercase tracking-wide">תאריך התחלה</h3>
+                            <p class="text-xl sm:text-3xl font-black text-blue-600">07.07.25</p>
+                        </div>
+                        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 flex flex-col items-center justify-center text-center">
+                            <h3 class="text-xs sm:text-lg font-bold text-gray-400 mb-1 uppercase tracking-wide">מטרה עיקרית</h3>
+                            <p class="text-xl sm:text-3xl font-black text-indigo-600">חיזוק ליבה</p>
+                        </div>
+                        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 flex flex-col items-center justify-center text-center">
+                            <h3 class="text-xs sm:text-lg font-bold text-gray-400 mb-1 uppercase tracking-wide">התקדמות ליבה</h3>
+                             <p class="text-lg sm:text-3xl font-black text-green-600">פלאנק</p>
+                             <p class="text-xs sm:text-base font-bold text-gray-500 mt-1">+20 ק"ג</p>
+                        </div>
+                        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 flex flex-col items-center justify-center text-center">
+                            <h3 class="text-xs sm:text-lg font-bold text-gray-400 mb-1 uppercase tracking-wide">התקדמות כוח</h3>
+                            <p class="text-lg sm:text-3xl font-black text-pink-600">בולגרי</p>
+                            <p class="text-xs sm:text-base font-bold text-gray-500 mt-1">+10 ק"ג</p>
+                        </div>
+                    </div>
+                    
+                     <div class="bg-yellow-50 border-r-4 border-yellow-400 p-4 rounded-xl shadow-sm flex gap-3 items-start">
+                        <i data-lucide="alert-circle" class="text-yellow-500 flex-shrink-0 mt-0.5 w-5 h-5"></i>
+                        <div>
+                            <p class="font-bold text-yellow-800 text-sm">דגש רפואי (14.7)</p>
+                            <p class="text-yellow-700 text-sm mt-1">מעקב: כאב ב-Side Bend ימין בהטיה לפנים.</p>
+                        </div>
+                    </div>
+
+                    <!-- אזור 2: תרגילי ליבה -->
+                    <div>
+                        <h2 class="text-2xl font-black text-gray-900 mb-4 px-1">תרגילים נבחרים</h2>
+                        <div class="space-y-4 sm:space-y-0 sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:gap-6">
+                            <!-- Hack Squat -->
+                            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                                <div class="flex justify-between items-center mb-3">
+                                     <h3 class="text-lg font-bold text-gray-800">האק סקוואט</h3>
+                                     <button class="p-2 -m-2 text-gray-400 hover:text-pink-500 active:scale-95 transition-transform graph-icon" data-exercise="hackSquat" data-exercise-name="האק סקוואט">
+                                        <i data-lucide="line-chart" class="w-6 h-6"></i>
+                                     </button>
+                                </div>
+                                <div class="flex justify-between items-end">
+                                    <div class="text-xs text-gray-400 font-medium">התחלה: 20 ק"ג</div>
+                                    <div class="text-right">
+                                        <div class="text-xs text-gray-500 mb-1">שיא (29.09)</div>
+                                        <div class="text-2xl font-black text-gray-800 leading-none">37.5 <span class="text-sm font-bold text-gray-500">ק"ג</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Smith Bench Press -->
+                            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                                <div class="flex justify-between items-center mb-3">
+                                    <h3 class="text-lg font-bold text-gray-800">בנץ' עליון</h3>
+                                    <button class="p-2 -m-2 text-gray-400 hover:text-pink-500 active:scale-95 transition-transform graph-icon" data-exercise="upperBenchPress" data-exercise-name="בנץ' עליון">
+                                        <i data-lucide="line-chart" class="w-6 h-6"></i>
+                                     </button>
+                                </div>
+                                <div class="flex justify-between items-end">
+                                    <div class="text-xs text-gray-400 font-medium">התחלה: 2.5 ק"ג</div>
+                                    <div class="text-right">
+                                        <div class="text-xs text-gray-500 mb-1">שיא (06.10)</div>
+                                        <div class="text-2xl font-black text-gray-800 leading-none">30 <span class="text-sm font-bold text-gray-500">ק"ג</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Narrow Row -->
+                            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                                <div class="flex justify-between items-center mb-3">
+                                    <h3 class="text-lg font-bold text-gray-800">חתירה צרה</h3>
+                                    <button class="p-2 -m-2 text-gray-400 hover:text-pink-500 active:scale-95 transition-transform graph-icon" data-exercise="narrowRow" data-exercise-name="חתירה צרה (מכונה)">
+                                        <i data-lucide="line-chart" class="w-6 h-6"></i>
+                                     </button>
+                                </div>
+                                <div class="flex justify-between items-end">
+                                    <div class="text-xs text-gray-400 font-medium">התחלה: 15 ק"ג</div>
+                                    <div class="text-right">
+                                        <div class="text-xs text-gray-500 mb-1">שיא (11.10)</div>
+                                        <div class="text-2xl font-black text-gray-800 leading-none">50 <span class="text-sm font-bold text-gray-500">ק"ג</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- טבלת שיאים -->
+                     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+                        <h2 class="text-xl font-black text-gray-900 mb-4">לוח שיאים</h2>
+                         <div class="grid grid-cols-2 lg:grid-cols-3 gap-3">
+                            <!-- New Records -->
+                            <div class="p-3 bg-green-50/50 border border-green-100 rounded-xl relative">
+                                <div class="absolute -top-2 -right-2 bg-green-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">חדש!</div>
+                                <h3 class="font-bold text-gray-700 text-sm">פשיטות ברכיים</h3>
+                                <p class="text-base font-black text-green-600 mt-1">50 ק"ג <span class="text-xs font-normal text-green-700">(5 חזרות)</span></p>
+                                <p class="text-[10px] text-gray-400">03.05.26</p>
+                            </div>
+                            <div class="p-3 bg-green-50/50 border border-green-100 rounded-xl relative">
+                                <div class="absolute -top-2 -right-2 bg-green-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">חדש!</div>
+                                <h3 class="font-bold text-gray-700 text-sm">קלין יד אחת</h3>
+                                <p class="text-base font-black text-green-600 mt-1">9 ק"ג</p>
+                                <p class="text-[10px] text-gray-400">17.12.25</p>
+                            </div>
+                            <div class="p-3 bg-green-50/50 border border-green-100 rounded-xl relative">
+                                <div class="absolute -top-2 -right-2 bg-green-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">חדש!</div>
+                                <h3 class="font-bold text-gray-700 text-sm">מכשיר אחיזה</h3>
+                                <p class="text-base font-black text-green-600 mt-1">35 ק"ג</p>
+                                <p class="text-[10px] text-gray-400">17.12.25</p>
+                            </div>
+
+                            <!-- Existing Records Condensed -->
+                            <div class="p-3 bg-gray-50 rounded-xl">
+                                <h3 class="font-bold text-gray-700 text-sm">האק סקוואט</h3>
+                                <p class="text-base font-black text-gray-800 mt-1">37.5</p>
+                            </div>
+                            <div class="p-3 bg-gray-50 rounded-xl">
+                                <h3 class="font-bold text-gray-700 text-sm">בנץ' עליון</h3>
+                                <p class="text-base font-black text-gray-800 mt-1">30</p>
+                            </div>
+                            <div class="p-3 bg-gray-50 rounded-xl">
+                                <h3 class="font-bold text-gray-700 text-sm">חתירה צרה</h3>
+                                <p class="text-base font-black text-gray-800 mt-1">50</p>
+                            </div>
+                             <div class="p-3 bg-gray-50 rounded-xl">
+                                <h3 class="font-bold text-gray-700 text-sm">מתח</h3>
+                                <p class="text-base font-black text-gray-800 mt-1">25-</p>
+                            </div>
+                             <div class="p-3 bg-gray-50 rounded-xl">
+                                <h3 class="font-bold text-gray-700 text-sm">מקבילים</h3>
+                                <p class="text-base font-black text-gray-800 mt-1">35-</p>
+                            </div>
+                             <div class="p-3 bg-gray-50 rounded-xl">
+                                <h3 class="font-bold text-gray-700 text-sm">בולגרי</h3>
+                                <p class="text-base font-black text-gray-800 mt-1">15</p>
+                            </div>
+                             <div class="p-3 bg-gray-50 rounded-xl">
+                                <h3 class="font-bold text-gray-700 text-sm">פלאנק</h3>
+                                <p class="text-base font-black text-gray-800 mt-1">20</p>
+                            </div>
+                             <div class="p-3 bg-gray-50 rounded-xl">
+                                <h3 class="font-bold text-gray-700 text-sm">כתפיים</h3>
+                                <p class="text-base font-black text-gray-800 mt-1">10</p>
+                            </div>
+                             <div class="p-3 bg-gray-50 rounded-xl">
+                                <h3 class="font-bold text-gray-700 text-sm">כפיפת ברך</h3>
+                                <p class="text-base font-black text-gray-800 mt-1">30</p>
+                            </div>
+                            <div class="p-3 bg-gray-50 rounded-xl">
+                                <h3 class="font-bold text-gray-700 text-sm">היפ טראסט</h3>
+                                <p class="text-base font-black text-gray-800 mt-1">35</p>
+                            </div>
+                            <div class="p-3 bg-gray-50 rounded-xl">
+                                <h3 class="font-bold text-gray-700 text-sm">סקוואט סמית'</h3>
+                                <p class="text-base font-black text-gray-800 mt-1">32.5</p>
+                            </div>
+                         </div>
+                    </div>
+                </div>
+
+                <!-- Personal Plans Pane -->
+                <div id="plansContent" class="hidden">
+                    <div class="mb-12">
+                        <h2 class="text-2xl font-black text-center mb-6 text-gray-900">תוכנית אימונים</h2>
+                         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 max-w-3xl mx-auto">
+                            <h3 class="text-xl font-bold text-pink-600 mb-6 border-b border-gray-100 pb-3 text-center">אימון FBW</h3>
+                            <ul class="space-y-4 text-gray-700">
+                                <!-- Exercise Item Template -->
+                                <li class="p-4 rounded-xl bg-gray-50 border border-gray-100">
+                                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center font-bold text-gray-900 mb-2">
+                                        <span class="text-lg">1. האק סקוואט</span>
+                                        <span class="text-pink-600 text-sm mt-1 sm:mt-0 bg-pink-50 px-2 py-0.5 rounded-md inline-block w-fit">3-4 סטים x 6-15</span>
+                                    </div>
+                                    <p class="text-sm text-gray-500 mb-3 leading-relaxed">תרגיל מרכזי לחיזוק הרגליים והישבן.</p>
+                                    <div>
+                                        <label for="notes-ex1" class="text-xs font-bold text-gray-400 uppercase tracking-wide">הערות:</label>
+                                        <textarea id="notes-ex1" rows="2" class="w-full mt-1 p-3 border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-pink-500 focus:border-pink-500 focus:outline-none transition-shadow text-base bg-white" placeholder="משקל, הרגשה..."></textarea>
+                                    </div>
+                                </li>
+                                <!-- End Template -->
+
+                                <li class="p-4 rounded-xl bg-gray-50 border border-gray-100">
+                                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center font-bold text-gray-900 mb-2">
+                                        <span class="text-lg">2. לחיצת חזה</span>
+                                        <span class="text-pink-600 text-sm mt-1 sm:mt-0 bg-pink-50 px-2 py-0.5 rounded-md inline-block w-fit">3-4 סטים x 6-15</span>
+                                    </div>
+                                    <p class="text-sm text-gray-500 mb-3 leading-relaxed">מכונה טכנוג'ים. לחזה וכתפיים.</p>
+                                    <div>
+                                        <label for="notes-ex2" class="text-xs font-bold text-gray-400 uppercase tracking-wide">הערות:</label>
+                                        <textarea id="notes-ex2" rows="2" class="w-full mt-1 p-3 border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-pink-500 focus:border-pink-500 focus:outline-none transition-shadow text-base bg-white" placeholder="משקל, הרגשה..."></textarea>
+                                    </div>
+                                </li>
+
+                                <li class="p-4 rounded-xl bg-gray-50 border border-gray-100">
+                                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center font-bold text-gray-900 mb-2">
+                                        <span class="text-lg">3. חתירה צרה</span>
+                                        <span class="text-pink-600 text-sm mt-1 sm:mt-0 bg-pink-50 px-2 py-0.5 rounded-md inline-block w-fit">3-4 סטים x 6-15</span>
+                                    </div>
+                                    <p class="text-sm text-gray-500 mb-3 leading-relaxed">מכונה טכנוג'ים. לגב.</p>
+                                    <div>
+                                        <label for="notes-ex3" class="text-xs font-bold text-gray-400 uppercase tracking-wide">הערות:</label>
+                                        <textarea id="notes-ex3" rows="2" class="w-full mt-1 p-3 border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-pink-500 focus:border-pink-500 focus:outline-none transition-shadow text-base bg-white" placeholder="משקל, הרגשה..."></textarea>
+                                    </div>
+                                </li>
+
+                                <li class="p-4 rounded-xl bg-gray-50 border border-gray-100">
+                                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center font-bold text-gray-900 mb-2">
+                                        <span class="text-lg">4. הרחקות כתפיים</span>
+                                        <span class="text-pink-600 text-sm mt-1 sm:mt-0 bg-pink-50 px-2 py-0.5 rounded-md inline-block w-fit">3-4 סטים x 6-15</span>
+                                    </div>
+                                    <div>
+                                        <label for="notes-ex4" class="text-xs font-bold text-gray-400 uppercase tracking-wide">הערות:</label>
+                                        <textarea id="notes-ex4" rows="2" class="w-full mt-1 p-3 border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-pink-500 focus:border-pink-500 focus:outline-none transition-shadow text-base bg-white" placeholder="משקל, הרגשה..."></textarea>
+                                    </div>
+                                </li>
+
+                                <li class="p-4 rounded-xl bg-gray-50 border border-gray-100">
+                                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center font-bold text-gray-900 mb-2">
+                                        <span class="text-lg">5. כפיפות ברכיים</span>
+                                        <span class="text-pink-600 text-sm mt-1 sm:mt-0 bg-pink-50 px-2 py-0.5 rounded-md inline-block w-fit">3-4 סטים x 6-15</span>
+                                    </div>
+                                    <p class="text-sm text-gray-500 mb-3 leading-relaxed">ישיבה. המסטרינג.</p>
+                                    <div>
+                                        <label for="notes-ex5" class="text-xs font-bold text-gray-400 uppercase tracking-wide">הערות:</label>
+                                        <textarea id="notes-ex5" rows="2" class="w-full mt-1 p-3 border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-pink-500 focus:border-pink-500 focus:outline-none transition-shadow text-base bg-white" placeholder="משקל, הרגשה..."></textarea>
+                                    </div>
+                                </li>
+
+                                 <li class="p-4 rounded-xl bg-gray-50 border border-gray-100">
+                                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center font-bold text-gray-900 mb-2">
+                                        <span class="text-lg">6. פלאנק משקל</span>
+                                        <span class="text-pink-600 text-sm mt-1 sm:mt-0 bg-pink-50 px-2 py-0.5 rounded-md inline-block w-fit">3-4 סטים מקס'</span>
+                                    </div>
+                                    <div>
+                                        <label for="notes-ex6" class="text-xs font-bold text-gray-400 uppercase tracking-wide">הערות:</label>
+                                        <textarea id="notes-ex6" rows="2" class="w-full mt-1 p-3 border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-pink-500 focus:border-pink-500 focus:outline-none transition-shadow text-base bg-white" placeholder="משקל, הרגשה..."></textarea>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Homework Pane (NEW) -->
+                <div id="homeworkContent" class="hidden h-full flex items-center justify-center pt-8">
+                     <div class="w-full max-w-lg">
+                        <div class="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden transform transition-all">
+                            <div class="bg-gradient-to-r from-pink-600 to-pink-500 p-6 text-white text-center relative overflow-hidden">
+                                <div class="absolute top-0 right-0 w-24 h-24 bg-white opacity-10 rounded-full -mr-10 -mt-10 blur-xl"></div>
+                                <h3 class="text-2xl font-black flex items-center justify-center gap-2 relative z-10">
+                                    <i data-lucide="dumbbell" class="w-6 h-6"></i>
+                                    משימה שבועית
+                                </h3>
+                                <p class="text-pink-100 text-sm mt-2 font-medium relative z-10">מעקב ביצוע - פשוט וקל</p>
+                            </div>
+                            
+                            <div class="p-8 flex flex-col items-center text-center">
+                                <div class="checkbox-wrapper w-full mb-8">
+                                    <label class="cursor-pointer relative block group">
+                                        <input type="checkbox" id="homeworkCheck" class="peer sr-only">
+                                        <div class="p-6 rounded-2xl border-2 border-gray-100 bg-gray-50 flex items-center justify-center gap-4 transition-all duration-300 peer-checked:bg-green-50 peer-checked:border-green-200 group-active:scale-[0.98]">
+                                            <div class="w-10 h-10 rounded-xl border-2 border-gray-300 peer-checked:bg-green-500 peer-checked:border-green-500 flex items-center justify-center transition-all bg-white shadow-sm">
+                                                <i data-lucide="check" class="text-white w-6 h-6 opacity-0 peer-checked:opacity-100 transition-opacity duration-300 stroke-[3]"></i>
+                                            </div>
+                                            <span class="text-lg font-bold text-gray-700 leading-tight text-right flex-1 select-none peer-checked:text-green-800 peer-checked:line-through transition-colors" id="homeworkText">לבצע אימון בסופיה עם משה או לבד</span>
+                                        </div>
+                                    </label>
+                                </div>
+                                
+                                <button id="whatsappBtn" onclick="sendWhatsapp()" class="w-full bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold py-4 px-8 rounded-2xl shadow-lg shadow-green-200 transition-all transform active:scale-95 flex items-center justify-center gap-3 opacity-50 pointer-events-none disabled:cursor-not-allowed">
+                                    <i data-lucide="send" class="w-5 h-5"></i>
+                                    <span>דיווח למאמן</span>
+                                </button>
+                                <p class="text-xs text-gray-400 mt-4 font-medium">סמן את המשימה כדי לשלוח עדכון</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Data and Initialization
+        const rawProgressData = {
+            hackSquat: [{date: '21.07.25', weight: 20}, {date: '28.07.25', weight: 22.5}, {date: '04.08.25', weight: 27.5}, {date: '07.08.25', weight: 27.5}, {date: '12.09.25', weight: 32.5}, {date: '26.09.25', weight: 35}, {date: '29.09.25', weight: 37.5}],
+            smithShoulderPress: [{date: '04.09.25', weight: 7.5}, {date: '15.09.25', weight: 10}],
+            plank: [{date: '14.07.25', weight: 5}, {date: '21.07.25', weight: 7.5}, {date: '04.08.25', weight: 10}, {date: '04.09.25', weight: 15}, {date: '12.09.25', weight: 20}, {date: '26.09.25', weight: 20}],
+            bulgarianSquat: [{date: '04.08.25', weight: 5}, {date: '04.09.25', weight: 6}, {date: '12.09.25', weight: 10}, {date: '15.09.25', weight: 12.5}, {date: '29.09.25', weight: 15}, {date: '06.10.25', weight: 15}],
+            narrowRow: [{date: '14.07.25', weight: 15}, {date: '18.08.25', weight: 20}, {date: '12.09.25', weight: 27.5}, {date: '26.09.25', weight: 27.5}, {date: '29.09.25', weight: 32.5}, {date: '11.10.25', weight: 50}, {date: '21.10.25', weight: 50}],
+            gravitonPullups: [{date: '18.08.25', weight: -35}, {date: '24.08.25', weight: -35}, {date: '12.09.25', weight: -35}, {date: '15.09.25', weight: -42}, {date: '29.09.25', weight: -28}, {date: '11.10.25', weight: -25}],
+            upperBenchPress: [{date: '18.08.25', weight: 2.5}, {date: '24.08.25', weight: 2.5}, {date: '12.09.25', weight: 32.5}, {date: '26.09.25', weight: 30}, {date: '29.09.25', weight: 32.5}, {date: '06.10.25', weight: 30}],
+            dips: [{date: '06.10.25', weight: -35}, {date: '11.10.25', weight: -35}],
+            hipThrust: [{date: '21.10.25', weight: 35}],
+            smithSquat: [{date: '21.10.25', weight: 32.5}],
+            oneHandClean: [{date: '17.12.25', weight: 9}],
+            gripMachine: [{date: '17.12.25', weight: 35}],
+            legExtensions: [{date: '03.05.26', weight: 50}]
+        };
+        
+        // Process data
+        const progressData = {};
+        for (const exerciseKey in rawProgressData) {
+            let maxWeight = -Infinity;
+            if (exerciseKey === 'gravitonPullups' || exerciseKey === 'dips') {
+                 let bestPerf = Infinity;
+                 progressData[exerciseKey] = rawProgressData[exerciseKey].map(dataPoint => {
+                    if (Math.abs(dataPoint.weight) < bestPerf) {
+                        bestPerf = Math.abs(dataPoint.weight);
+                    }
+                    return { ...dataPoint, weight: -bestPerf };
+                });
+            } else {
+                progressData[exerciseKey] = rawProgressData[exerciseKey].map(dataPoint => {
+                    if (dataPoint.weight > maxWeight) {
+                        maxWeight = dataPoint.weight;
+                    }
+                    return { ...dataPoint, weight: maxWeight };
+                });
+            }
+        }
+        
+        // Tab Navigation Logic
+        const tabs = [
+            { id: 'progressTab', content: 'progressContent' },
+            { id: 'plansTab', content: 'plansContent' },
+            { id: 'homeworkTab', content: 'homeworkContent' }
+        ];
+
+        tabs.forEach(tab => {
+            document.getElementById(tab.id).addEventListener('click', () => {
+                // Hide all contents and reset all tabs
+                tabs.forEach(t => {
+                    document.getElementById(t.content).classList.add('hidden');
+                    document.getElementById(t.id).classList.remove('tab-active');
+                    document.getElementById(t.id).classList.add('text-gray-500');
+                });
+                // Show current content and activate current tab
+                document.getElementById(tab.content).classList.remove('hidden');
+                document.getElementById(tab.id).classList.add('tab-active');
+                document.getElementById(tab.id).classList.remove('text-gray-500');
+            });
+        });
+
+        // Homework Checkbox Logic
+        const homeworkCheck = document.getElementById('homeworkCheck');
+        const whatsappBtn = document.getElementById('whatsappBtn');
+        const homeworkText = document.getElementById('homeworkText');
+
+        homeworkCheck.addEventListener('change', function() {
+            if (this.checked) {
+                whatsappBtn.classList.remove('opacity-50', 'pointer-events-none');
+            } else {
+                whatsappBtn.classList.add('opacity-50', 'pointer-events-none');
+            }
+        });
+
+        function sendWhatsapp() {
+            const task = homeworkText.innerText;
+            const text = encodeURIComponent(`היי המאמן! 👋\nסיימתי את משימת שיעורי הבית: "${task}" ✅`);
+            // Uses the app scheme to open directly
+            window.location.href = `whatsapp://send?text=${text}`;
+        }
+
+        // Chart Initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            const icons = document.querySelectorAll('.graph-icon');
+            icons.forEach(icon => {
+                icon.addEventListener('click', () => {
+                    const exerciseKey = icon.dataset.exercise;
+                    const exerciseName = icon.dataset.exerciseName;
+                    const exerciseData = progressData[exerciseKey];
+
+                    if (exerciseData && exerciseData.length > 0) {
+                        const modal = document.createElement('div');
+                        modal.innerHTML = `
+                            <div class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
+                                <div class="bg-white rounded-3xl shadow-2xl w-full max-w-3xl p-6 relative">
+                                    <div class="flex justify-between items-center mb-6 border-b border-gray-100 pb-4">
+                                        <h3 class="text-xl font-black text-gray-900">${exerciseName}</h3>
+                                        <button class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 hover:text-gray-800 hover:bg-gray-200 transition-colors">
+                                            <i data-lucide="x" class="w-5 h-5"></i>
+                                        </button>
+                                    </div>
+                                    <div class="relative h-64 sm:h-80 w-full">
+                                        <canvas id="modalChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        document.body.appendChild(modal);
+                        lucide.createIcons();
+                        
+                        const closeModal = () => modal.remove();
+                        modal.querySelector('button').addEventListener('click', closeModal);
+                        modal.addEventListener('click', (e) => {
+                            if (e.target === modal.firstChild) closeModal();
+                        });
+
+                        const chartCanvas = modal.querySelector('canvas').getContext('2d');
+                        new Chart(chartCanvas, {
+                            type: 'line',
+                            data: {
+                                labels: exerciseData.map(d => d.date),
+                                datasets: [{
+                                    label: 'משקל שיא (ק"ג)',
+                                    data: exerciseData.map(d => d.weight),
+                                    backgroundColor: 'rgba(219, 39, 119, 0.1)',
+                                    borderColor: '#db2777',
+                                    borderWidth: 3,
+                                    pointBackgroundColor: '#fff',
+                                    pointBorderColor: '#db2777',
+                                    pointBorderWidth: 2,
+                                    pointRadius: 6,
+                                    tension: 0.3,
+                                    fill: true,
+                                }]
+                            },
+                            options: {
+                                layout: {
+                                    padding: 10
+                                },
+                                scales: { 
+                                    y: { 
+                                        beginAtZero: false, 
+                                        grid: { color: '#f3f4f6' },
+                                        ticks: { font: { family: 'Assistant' } }
+                                    },
+                                    x: {
+                                        grid: { display: false },
+                                        ticks: { font: { family: 'Assistant' } }
+                                    }
+                                },
+                                plugins: {
+                                    legend: { display: false },
+                                    tooltip: {
+                                        backgroundColor: '#1f2937',
+                                        padding: 12,
+                                        titleFont: { family: 'Assistant', size: 14 },
+                                        bodyFont: { family: 'Assistant', size: 14 },
+                                        cornerRadius: 8,
+                                        displayColors: false
+                                    }
+                                },
+                                responsive: true,
+                                maintainAspectRatio: false
+                            }
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
